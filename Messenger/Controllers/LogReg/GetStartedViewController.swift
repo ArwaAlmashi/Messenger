@@ -6,6 +6,7 @@ class GetStartedViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("hello world!")
     }
 
 
