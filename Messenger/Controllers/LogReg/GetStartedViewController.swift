@@ -10,7 +10,6 @@ class GetStartedViewController: UIViewController {
     }
 
     @IBAction func getStartedButton(_ sender: UIButton) {
-
         let registerVC = self.storyboard?.instantiateViewController(withIdentifier: "RegisterViewController") as! RegisterViewController
         self.navigationController?.pushViewController(registerVC, animated: true)
 

@@ -7,6 +7,12 @@ target 'Messenger' do
 
   # Pods for Messenger
 
+  # add the Firebase pod for Google Analytics
+    pod 'Firebase/Analytics'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Core'
+
+
   target 'MessengerTests' do
     inherit! :search_paths
     # Pods for testing

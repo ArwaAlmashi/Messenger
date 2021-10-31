@@ -1,6 +1,8 @@
 
 
 import UIKit
+import MobileCoreServices
+import FirebaseAuth
 
 class RegisterViewController: UIViewController {
 
@@ -8,30 +10,85 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var lastNameTextField: UITextField!
     @IBOutlet weak var emailAddressTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var profileImage: UIButton!
+    @IBOutlet weak var profileImageButtonOutlet: UIButton!
+    var user : User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+       
     }
     
     @IBAction func registerButton(_ sender: UIButton) {
+        createNewUser()
     }
     
     @IBAction func loginButton(_ sender: UIButton) {
         let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
         self.navigationController?.pushViewController(loginVC, animated: true)
     }
-    
+ 
     @IBAction func profileImageButton(_ sender: UIButton) {
         presentPhotoActionSheet()
     }
     
+    func createNewUser() {
+
+        validationUserInput()
+        if let user = user {
+            Auth.auth().createUser(withEmail: user.email, password: user.password) {
+                (authResult: AuthDataResult?, error: Error?) in
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
+                } else {
+                    print("sucess adding the user account: \(user.email)")
+                    let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "TestConversationViewController") as! TestConversationViewController
+                    self.navigationController?.pushViewController(ConversationVC, animated: true)
+                }
+            }
+        }
+        
+    }
+    
+    func validationUserInput() {
+        
+        guard let firstName = emailAddressTextField.text, !firstName.isEmpty else {
+            validationAlertMessege(messege: "first name field can not be empty")
+            return
+        }
+        guard let lastName = lastNameTextField.text, !lastName.isEmpty else {
+            validationAlertMessege(messege: "last name field can not be empty")
+            return
+        }
+        guard let email = emailAddressTextField.text, !email.isEmpty else {
+            validationAlertMessege(messege: "email field can not be empty")
+            return
+        }
+        guard let password = passwordTextField.text, !password.isEmpty else {
+            validationAlertMessege(messege: "password field can not be empty")
+            return
+        }
+//        guard let profileImage = profileImageButtonOutlet else {
+//        validationAlertMessege(messege: "profile image can not be empty")
+//            return
+//        }
+        
+        let tempProfileImageURL = "URL image"
+        self.user = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: tempProfileImageURL, password: password)
+
+    }
+    
+    func validationAlertMessege(messege: String){
+        let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
 }
 
-
+// MARK: Image picker
 extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    // get results of user taking picture or selecting from camera roll
+ 
     func presentPhotoActionSheet(){
         let actionSheet = UIAlertController(title: "Profile Picture", message: "How would you like to select a picture?", preferredStyle: .actionSheet)
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -65,36 +122,17 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
         guard let selectedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {
             return
         }
-        self.profileImage.frame = CGRect(x: 125.0, y: 104.0, width: 178.0, height: 178.0)
-        self.profileImage.setImage(selectedImage, for: .normal)
-   
+        insertProfilePhoto(image: selectedImage)
     }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true, completion: nil)
+
+    func insertProfilePhoto(image : UIImage) {
+        profileImageButtonOutlet.layer.cornerRadius = 90
+        profileImageButtonOutlet.layer.masksToBounds = true
+        profileImageButtonOutlet.layer.borderWidth = 5
+        profileImageButtonOutlet.layer.borderColor = UIColor.white.cgColor
+        profileImageButtonOutlet.setBackgroundImage(image, for: .normal)
     }
-    
-//    func ResizeImage() {
-//
-//        let button = UIButton(type: UIButton.ButtonType.system) as UIButton
-//        // set the frame
-//        button.frame = CGRect(x: 100, y: 100, width: 100, height: 100)
-//        // add image
-//        button.setBackgroundImage(UIImage(named:"SearchIcon"), for: .normal)
-//        // button title
-//        button.setTitle("Test Button", for: .normal)
-//        // add action
-//
-//        button.translatesAutoresizingMaskIntoConstraints = false
-//        // add button on view
-//        self.view.addSubview(button)
-//        // all constaints
-//        let widthContraints =  NSLayoutConstraint(item: button, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 200)
-//        let heightContraints = NSLayoutConstraint(item: button, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 100)
-//        let xContraints = NSLayoutConstraint(item: button, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
-//        let yContraints = NSLayoutConstraint(item: button, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: 0)
-//        NSLayoutConstraint.activate([heightContraints,widthContraints,xContraints,yContraints])
-//    }
+
     
     
 }
