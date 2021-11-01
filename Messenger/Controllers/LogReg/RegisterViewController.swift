@@ -1,10 +1,11 @@
 
 
 import UIKit
-import MobileCoreServices
 import FirebaseAuth
+import FirebaseDatabase
 
 class RegisterViewController: UIViewController {
+    
 
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
@@ -32,16 +33,18 @@ class RegisterViewController: UIViewController {
     }
     
     func createNewUser() {
-
         validationUserInput()
         if let user = user {
             Auth.auth().createUser(withEmail: user.email, password: user.password) {
                 (authResult: AuthDataResult?, error: Error?) in
                 if let error = error {
-                    print("Error: \(error.localizedDescription)")
+                    self.errorMessege(messege: error.localizedDescription)
                 } else {
                     print("sucess adding the user account: \(user.email)")
-                    let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "TestConversationViewController") as! TestConversationViewController
+                    let databaseManager = DatabaseManger()
+                    print("User sending to database manager \(user)")
+                    databaseManager.test(user: user)
+                    let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "ConversationViewController") as! ConversationViewController
                     self.navigationController?.pushViewController(ConversationVC, animated: true)
                 }
             }
@@ -51,7 +54,7 @@ class RegisterViewController: UIViewController {
     
     func validationUserInput() {
         
-        guard let firstName = emailAddressTextField.text, !firstName.isEmpty else {
+        guard let firstName = firstNameTextField.text, !firstName.isEmpty else {
             validationAlertMessege(messege: "first name field can not be empty")
             return
         }
@@ -77,12 +80,19 @@ class RegisterViewController: UIViewController {
 
     }
     
-    func validationAlertMessege(messege: String){
-        let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
+    func errorMessege(messege: String) {
+        let alert = UIAlertController(title: "Error", message: messege, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        alert.view.tintColor = UIColor(red: 0.76, green: 0.41, blue: 0.65, alpha: 1.00)
         self.present(alert, animated: true, completion: nil)
     }
     
+    func validationAlertMessege(messege: String){
+        let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        alert.view.tintColor = UIColor(red: 0.76, green: 0.41, blue: 0.65, alpha: 1.00)
+        self.present(alert, animated: true, completion: nil)
+    }
     
 }
 
@@ -126,7 +136,7 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
     }
 
     func insertProfilePhoto(image : UIImage) {
-        profileImageButtonOutlet.layer.cornerRadius = 90
+        profileImageButtonOutlet.layer.cornerRadius = 89
         profileImageButtonOutlet.layer.masksToBounds = true
         profileImageButtonOutlet.layer.borderWidth = 5
         profileImageButtonOutlet.layer.borderColor = UIColor.white.cgColor

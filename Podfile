@@ -11,6 +11,7 @@ target 'Messenger' do
     pod 'Firebase/Analytics'
     pod 'Firebase/Auth'
     pod 'Firebase/Core'
+    pod 'Firebase/Database'
 
 
   target 'MessengerTests' do

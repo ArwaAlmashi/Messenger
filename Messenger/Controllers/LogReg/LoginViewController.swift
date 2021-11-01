@@ -45,11 +45,12 @@ class LoginViewController: UIViewController {
         
         Auth.auth().signIn(withEmail: email, password: password) {
             (autherResult: AuthDataResult?, error: Error? )  in
+            
             if let error = error {
-                print("Error: \(error.localizedDescription)")
+                self.errorMessege(messege: error.localizedDescription)
             } else {
                 print("success login user: \(email)")
-                let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "TestConversationViewController") as! TestConversationViewController
+                let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "ConversationViewController") as! ConversationViewController
                 self.navigationController?.pushViewController(ConversationVC, animated: true)
                 
             }
@@ -63,9 +64,17 @@ class LoginViewController: UIViewController {
       
     }
     
+    func errorMessege(messege: String) {
+        let alert = UIAlertController(title: "Error", message: messege, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        alert.view.tintColor = UIColor(red: 0.76, green: 0.41, blue: 0.65, alpha: 1.00)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     func validationAlertMessege(messege: String){
         let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))        
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+        alert.view.tintColor = UIColor(red: 0.76, green: 0.41, blue: 0.65, alpha: 1.00)
         self.present(alert, animated: true, completion: nil)
     }
     
