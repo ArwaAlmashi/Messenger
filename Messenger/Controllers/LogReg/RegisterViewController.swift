@@ -49,8 +49,11 @@ class RegisterViewController: UIViewController {
                 if let error = error {
                     self.errorMessege(messege: error.localizedDescription)
                 } else {
-                    print("sucess adding the user account: \(user.email)")
-                    DatabaseManger.shared.insertUserIntoDatabase(user: user) 
+                    DatabaseManger.shared.insertUser(with: user) { isUserdInsert in
+                        if isUserdInsert {
+                            print("sucess adding the user account: \(user.email)")
+                        }
+                    }
                     self.delegate?.registerSuccessful()
                     self.navigationController?.popViewController(animated: false)
                 }

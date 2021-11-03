@@ -10,16 +10,13 @@ import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
+    var conversation = Conversation()
     var messages = [Message]()
     
-    // Testing varibels
-    //let testuserID = Auth.auth().currentUser?.uid
-    //let senderUser = Sender(senderId: "2", displayName: "Nada", profileImage: "")
-    
+    public var friendId : String?
+    public var friendName : String?
     
     // Platform Varibles
-    public var otherUserEmail: String?
-    private var conversationId: String?
     public var isNewConversation = false
     
     //Date Formating to string
@@ -42,7 +39,8 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpChat()
-        removeMessageAvatars()
+        let testMessage = Message(sender: Sender(senderId: "0", displayName: "defulte", profileImage: ""), messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hello World!"))
+        insertNewMessage(testMessage)
     }
     
     // Set up ChatVC
@@ -53,8 +51,9 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
+        removeMessageAvatars()
     }
-    
+     
     // Insert new message in UI
     private func insertNewMessage(_ message: Message) {
         if messages.contains(where: {$0.messageId == message.messageId}) {
@@ -63,6 +62,11 @@ class ChatViewController: MessagesViewController {
         messages.append(message)
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem(animated: true)
+        
+        self.conversation.messages.append(message)
+//        DatabaseManger.shared.insertMessage(with: conversation) { success in
+//            print("success add message")
+//        }
     }
     
 //    Test Messages
@@ -166,22 +170,25 @@ extension ChatViewController: MessagesDisplayDelegate {
 }
 
 
-//extension ChatViewController:
 extension ChatViewController: InputBarAccessoryViewDelegate {
     
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
-//        guard !text.replacingOccurrences(of: " ", with: "").isEmpty, let selfSender = self.selfSender, let messageId = createMessageId() else {
-//            return
-//        }
-        let message = Message(sender: selfSender!, messageId: createMessageId()!, sentDate: Date().addingTimeInterval(8000), kind: .text(text))
-        print("sending \(text)")
+        
+        guard  let selfSender = self.selfSender, let messageId = createMessageId() else {
+            print("something in message is wrong")
+            return
+        }
+        let message = Message(sender: selfSender, messageId: messageId, sentDate: Date(), kind: .text(text))
+        print("sending: \(text)")
         insertNewMessage(message)
-        //print("self sender \(selfSender) message id \(messageId)")
+        inputBar.inputTextView.text = ""
+        
     }
     
     func createMessageId() -> String? {
         let dateString = Self.dateFormatter.string(from: Date())
         let newIdentifier = "\(selfSender?.senderId ?? "null" )_\(dateString)"
+        print(newIdentifier)
         return newIdentifier
     }
     

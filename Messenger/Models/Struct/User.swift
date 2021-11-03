@@ -19,22 +19,22 @@ struct User {
     var conversation : [[String : Any]]
 }
 
-//let conversation : [
-//
-//    "Messages" : [Message],
-//    "Secound User" : senderID
-//]
 
+struct UserNSObject {
+    
+    var userId : String?
+    
+    var fullName : String?
+    
+    var email : String?
+    
+    var profileImage : String?
+    
+    var conversation : [[String : Any]?]?
 
-//struct User {
-//
-//    var fullName : String
-//
-//    var email : String
-//
-//    var profileImage : String
-//
-//    var password: String
-//
-//}
+}
 
+struct Conversation {
+    var friend : Sender?
+    var messages : [Message] = []
+}

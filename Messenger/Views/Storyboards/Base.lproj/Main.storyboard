@@ -153,7 +153,7 @@
                                                     <constraint firstAttribute="height" constant="55" id="DQE-9s-Bvh"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="856-F4-xod">
                                                 <rect key="frame" x="0.0" y="150" width="374" height="55"/>
@@ -334,7 +334,7 @@
                                                     <constraint firstAttribute="height" constant="55" id="ZEi-Fm-HaW"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                <textInputTraits key="textInputTraits"/>
+                                                <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nFG-t1-MiP">
                                                 <rect key="frame" x="0.0" y="300" width="374" height="55"/>
@@ -451,7 +451,7 @@
                                 </constraints>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T7k-ex-A46">
-                                <rect key="frame" x="358" y="85" width="36" height="36.5"/>
+                                <rect key="frame" x="358" y="85" width="36" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="38" id="V3E-Mc-wkX"/>
                                     <constraint firstAttribute="width" constant="36" id="gXU-hJ-Z3F"/>
@@ -459,9 +459,9 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="23"/>
                                 <color key="tintColor" systemColor="systemBackgroundColor"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" backgroundImage="square.and.pencil" catalog="system"/>
+                                <state key="normal" backgroundImage="rectangle.portrait.and.arrow.right.fill" catalog="system"/>
                                 <connections>
-                                    <action selector="newChatButton:" destination="lET-AJ-YGc" eventType="touchUpInside" id="gbz-W9-DPY"/>
+                                    <action selector="logoutButton:" destination="lET-AJ-YGc" eventType="touchUpInside" id="bMj-Oh-pcC"/>
                                 </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5Om-Ay-b5Z">
@@ -507,6 +507,11 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" red="0.92148774860000005" green="0.9216202497" blue="0.92145884040000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="emailLabel" destination="QJV-y6-b2n" id="28T-Gz-zTB"/>
+                                            <outlet property="nameLabel" destination="721-rv-Mgh" id="h3E-Tm-eci"/>
+                                            <outlet property="profileImage" destination="MVT-O0-DTv" id="enw-KU-er2"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
@@ -638,7 +643,7 @@
         <image name="header register" width="375" height="207"/>
         <image name="icon" width="352" height="298"/>
         <image name="logo" width="126" height="128"/>
-        <image name="square.and.pencil" catalog="system" width="128" height="115"/>
+        <image name="rectangle.portrait.and.arrow.right.fill" catalog="system" width="128" height="108"/>
         <namedColor name="avatarViewBackground">
             <color red="0.55699998140335083" green="0.55699998140335083" blue="0.57599997520446777" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
