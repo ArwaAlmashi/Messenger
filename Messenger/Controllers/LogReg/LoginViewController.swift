@@ -4,20 +4,23 @@ import UIKit
 import FirebaseAuth
 
 
+protocol loginDelegate {
+    func loginSuccessful()
+}
+
 class LoginViewController: UIViewController {
 
     @IBOutlet weak var emailAddressTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
+    
+    var delegate : loginDelegate?
     var user : User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("Login")
-
-        
     }
     
-    
+    // IBAction
     @IBAction func loginButton(_ sender: UIButton) {
         userLogin()
     }
@@ -29,11 +32,12 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func registerButton(_ sender: UIButton) {
-        let registerVC = self.storyboard?.instantiateViewController(withIdentifier: "RegisterViewController") as! RegisterViewController
-        self.navigationController?.pushViewController(registerVC, animated: true)
+        self.navigationController?.popViewController(animated: true)
     }
     
+    // Login user & Firebase authentcation
     func userLogin() {
+        
         guard let email = emailAddressTextField.text, !email.isEmpty else {
             validationAlertMessege(messege: "email field can not be empty")
             return
@@ -42,7 +46,7 @@ class LoginViewController: UIViewController {
             validationAlertMessege(messege: "password field can not be empty")
             return
         }
-        
+
         Auth.auth().signIn(withEmail: email, password: password) {
             (autherResult: AuthDataResult?, error: Error? )  in
             
@@ -50,20 +54,13 @@ class LoginViewController: UIViewController {
                 self.errorMessege(messege: error.localizedDescription)
             } else {
                 print("success login user: \(email)")
-                let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "ConversationViewController") as! ConversationViewController
-                self.navigationController?.pushViewController(ConversationVC, animated: true)
-                
+                self.delegate?.loginSuccessful()
+                self.navigationController?.popViewController(animated: false)                
             }
-            
         }
-        
     }
-    
-    func validationUserInput() {
-        
-      
-    }
-    
+
+    // Error Message from Firebase
     func errorMessege(messege: String) {
         let alert = UIAlertController(title: "Error", message: messege, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
@@ -71,6 +68,7 @@ class LoginViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    // Error Message from valdiation
     func validationAlertMessege(messege: String){
         let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))

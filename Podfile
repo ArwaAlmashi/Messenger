@@ -9,9 +9,24 @@ target 'Messenger' do
 
   # add the Firebase pod for Google Analytics
     pod 'Firebase/Analytics'
-    pod 'Firebase/Auth'
-    pod 'Firebase/Core'
-    pod 'Firebase/Database'
+
+  # Firebase
+    #pod 'Firebase/Core'
+    #pod 'Firebase/Auth'
+    #pod 'Firebase/Database'
+    #pod 'Firebase/Storage'
+
+  # Facebook
+    #pod 'FBSDKLoginKit'
+
+  # Google Sign in
+    #pod 'GoogleSignIn'
+
+  # message kit
+    pod 'MessageKit'
+    pod 'JGProgressHUD' # spinner overlay (heads up display)
+    #pod 'RealmSwift' # similar to coredata (save to device) optimize
+    pod 'SDWebImage' # Image load capability (caching)
 
 
   target 'MessengerTests' do

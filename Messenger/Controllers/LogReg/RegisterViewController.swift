@@ -4,6 +4,10 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 
+protocol registerDelegate {
+    func registerSuccessful()
+}
+
 class RegisterViewController: UIViewController {
     
 
@@ -12,46 +16,50 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var emailAddressTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var profileImageButtonOutlet: UIButton!
+    
+    var delegate : registerDelegate?
     var user : User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+
     }
     
+    // IBAction
     @IBAction func registerButton(_ sender: UIButton) {
         createNewUser()
     }
     
     @IBAction func loginButton(_ sender: UIButton) {
-        let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
-        self.navigationController?.pushViewController(loginVC, animated: true)
+        self.navigationController?.popViewController(animated: true)
     }
  
     @IBAction func profileImageButton(_ sender: UIButton) {
         presentPhotoActionSheet()
     }
     
+    // Register User & Firebase authentcation & Insert into RealDB
     func createNewUser() {
         validationUserInput()
+        
         if let user = user {
             Auth.auth().createUser(withEmail: user.email, password: user.password) {
                 (authResult: AuthDataResult?, error: Error?) in
+                
                 if let error = error {
                     self.errorMessege(messege: error.localizedDescription)
                 } else {
                     print("sucess adding the user account: \(user.email)")
-                    let databaseManager = DatabaseManger()
-                    print("User sending to database manager \(user)")
-                    databaseManager.test(user: user)
-                    let ConversationVC = self.storyboard?.instantiateViewController(withIdentifier: "ConversationViewController") as! ConversationViewController
-                    self.navigationController?.pushViewController(ConversationVC, animated: true)
+                    DatabaseManger.shared.insertUserIntoDatabase(user: user) 
+                    self.delegate?.registerSuccessful()
+                    self.navigationController?.popViewController(animated: false)
                 }
+                
             }
         }
-        
     }
     
+    // Valdiation user inputs
     func validationUserInput() {
         
         guard let firstName = firstNameTextField.text, !firstName.isEmpty else {
@@ -76,10 +84,11 @@ class RegisterViewController: UIViewController {
 //        }
         
         let tempProfileImageURL = "URL image"
-        self.user = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: tempProfileImageURL, password: password)
+        self.user = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: tempProfileImageURL, password: password, conversation: [])
 
     }
     
+    // Error Message from Firebase
     func errorMessege(messege: String) {
         let alert = UIAlertController(title: "Error", message: messege, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
@@ -87,6 +96,7 @@ class RegisterViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    // Error Message from valdiation
     func validationAlertMessege(messege: String){
         let alert = UIAlertController(title: "Empty Field", message: messege, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
@@ -96,7 +106,7 @@ class RegisterViewController: UIViewController {
     
 }
 
-// MARK: Image picker
+// MARK: Image Picker
 extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
  
     func presentPhotoActionSheet(){
