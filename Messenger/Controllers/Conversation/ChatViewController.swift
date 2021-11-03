@@ -18,23 +18,22 @@ class ChatViewController: MessagesViewController {
     
     
     // Platform Varibles
-    public let otherUserEmail: String?
-    private let conversationId: String?
+    public var otherUserEmail: String?
+    private var conversationId: String?
     public var isNewConversation = false
     
-    // Creating a new conversation, there is no identifier
-    init(with email: String, id: String?) {
-        self.conversationId = id
-        self.otherUserEmail = email
-        super.init(nibName: nil, bundle: nil)
-    }
-    required init?(coder: NSCoder) {
-        fatalError("init (coder:\(coder) has not been implemented")
-    }
+    //Date Formating to string
+    public static var dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .long
+            formatter.locale = .current
+            return formatter
+    }()
     
     // Returen self sender
     private var selfSender: Sender? {
-        guard let userID = UserDefaults.standard.value(forKey: "user id") as? String else {
+        guard let userID = Auth.auth().currentUser?.uid else {
             return nil
         }
         return Sender(senderId: userID, displayName: "Me", profileImage: "")
@@ -53,6 +52,7 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
+        messageInputBar.delegate = self
     }
     
     // Insert new message in UI
@@ -73,40 +73,7 @@ class ChatViewController: MessagesViewController {
 //        let testMessage2 = Message(sender: senderUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hi"))
 //        insertNewMessage(testMessage2)
 //    }
-    
-    
-    private func listenForMessages(id: String, shouldScrollToBottom: Bool) {
-//        DatabaseManger.shared.getAllMessagesForConversation(with: id) { [weak self] result in
-//        switch result {
-//
-//            case .success(let messages):
-//                print("success in getting messages: \(messages)")
-//                guard !messages.isEmpty else {
-//                    print("messages are empty")
-//                    return
-//                }
-//                self?.messages = messages
-//
-//                DispatchQueue.main.async {
-//                    self?.messagesCollectionView.reloadDataAndKeepOffset()
-//                    if shouldScrollToBottom {
-//                        self?.messagesCollectionView.scrollToLastItem()
-//                    }
-//                }
-//
-//            case .failure(let error):
-//                print("failed to get messages: \(error)")
-//            }
-//        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        messageInputBar.inputTextView.becomeFirstResponder()
-        if let conversationId = conversationId {
-            listenForMessages(id:conversationId, shouldScrollToBottom: true)
-        }
-    }
+
 }
 
 
@@ -120,13 +87,15 @@ extension ChatViewController: MessagesDataSource {
 
     // 2 Current sender = current user
     func currentSender() -> SenderType {
-        //
-        return Sender(senderId: selfSender!.senderId, displayName: "Arwa", profileImage: "")
+        if let sender = selfSender {
+            return sender
+        }
+        return Sender(senderId: "12", displayName: "erroe", profileImage: "")
     }
 
     // 3 Show messsages
     func messageForItem( at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView ) -> MessageType {
-    return messages[indexPath.section]
+        return messages[indexPath.section]
     }
 
     // 4 Name above messages
@@ -155,7 +124,6 @@ extension ChatViewController: MessagesLayoutDelegate {
 extension ChatViewController: MessagesDisplayDelegate {
   
     func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
-        // color if every user message
       return isFromCurrentSender(message: message) ?
         UIColor(red: 0.95, green: 0.52, blue: 0.44, alpha: 1.00) :
         UIColor(red: 0.86, green: 0.45, blue: 0.67, alpha: 1.00)
@@ -169,7 +137,7 @@ extension ChatViewController: MessagesDisplayDelegate {
         avatarView.isHidden = true
     }
     
-    // style of image shape 
+    // style of message shape
     func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
         let corner: MessageStyle.TailCorner = isFromCurrentSender(message: message) ? .bottomRight : .bottomLeft
         return .bubbleTail(corner, .curved)
@@ -198,6 +166,26 @@ extension ChatViewController: MessagesDisplayDelegate {
 }
 
 
-//extension ChatViewController: 
+//extension ChatViewController:
+extension ChatViewController: InputBarAccessoryViewDelegate {
+    
+    func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+//        guard !text.replacingOccurrences(of: " ", with: "").isEmpty, let selfSender = self.selfSender, let messageId = createMessageId() else {
+//            return
+//        }
+        let message = Message(sender: selfSender!, messageId: createMessageId()!, sentDate: Date().addingTimeInterval(8000), kind: .text(text))
+        print("sending \(text)")
+        insertNewMessage(message)
+        //print("self sender \(selfSender) message id \(messageId)")
+    }
+    
+    func createMessageId() -> String? {
+        let dateString = Self.dateFormatter.string(from: Date())
+        let newIdentifier = "\(selfSender?.senderId ?? "null" )_\(dateString)"
+        return newIdentifier
+    }
+    
+    
+}
 
 

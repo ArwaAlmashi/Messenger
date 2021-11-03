@@ -8,7 +8,7 @@ target 'Messenger' do
   # Pods for Messenger
 
   # add the Firebase pod for Google Analytics
-    pod 'Firebase/Analytics'
+    #pod 'Firebase/Analytics'
 
   # Firebase
     #pod 'Firebase/Core'
@@ -23,8 +23,8 @@ target 'Messenger' do
     #pod 'GoogleSignIn'
 
   # message kit
-    pod 'MessageKit'
-    pod 'JGProgressHUD' # spinner overlay (heads up display)
+    #pod 'MessageKit'
+    #pod 'JGProgressHUD' # spinner overlay (heads up display)
     #pod 'RealmSwift' # similar to coredata (save to device) optimize
     pod 'SDWebImage' # Image load capability (caching)
 

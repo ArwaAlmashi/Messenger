@@ -26,20 +26,7 @@ final class DatabaseManger {
         ]
         database.child(userID).setValue(userDic)
     }
-    
-//    public func insertMessageIntoDatabase(user : User) {
-//        
-//        guard let userID = Auth.auth().currentUser?.uid else {
-//            return
-//        }
-//        let messageDic : [ String : Any ] = [
-//            "sender" : userID,
-//            "messageId" : "",
-//            "sentDate" : "",
-//            "kind" : ""
-//        ]
-//        database.child(userID).setValue(messageDic)
-//    }
+
     
 }
 

@@ -461,7 +461,7 @@
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" backgroundImage="square.and.pencil" catalog="system"/>
                                 <connections>
-                                    <action selector="newChatButton:" destination="lET-AJ-YGc" eventType="touchUpInside" id="Z2f-Lx-vww"/>
+                                    <action selector="newChatButton:" destination="lET-AJ-YGc" eventType="touchUpInside" id="gbz-W9-DPY"/>
                                 </connections>
                             </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="5Om-Ay-b5Z">
@@ -554,7 +554,7 @@
         <!--Hello-->
         <scene sceneID="usQ-XE-PBv">
             <objects>
-                <viewController storyboardIdentifier="ChatViewController" id="2FP-Yt-Csf" customClass="TestChatViewController" customModule="Messenger" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="TestChatViewController" id="2FP-Yt-Csf" customClass="TestChatViewController" customModule="Messenger" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3W4-ks-Xak">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -583,7 +583,7 @@
         <!--Chat View Controller-->
         <scene sceneID="24m-vD-IOu">
             <objects>
-                <viewController storyboardIdentifier="TestChatViewController" id="S4N-Tg-hy9" customClass="ChatViewController" customModule="Messenger" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ChatViewController" id="S4N-Tg-hy9" customClass="ChatViewController" customModule="Messenger" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="jMv-sW-StM">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
