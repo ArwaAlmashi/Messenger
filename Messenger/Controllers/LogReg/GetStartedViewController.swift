@@ -9,6 +9,7 @@ class GetStartedViewController: UIViewController, registerDelegate, loginDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.navigationBar.tintColor = UIColor(red: 0.95, green: 0.52, blue: 0.44, alpha: 1.00)
     }
     
     override func viewWillAppear(_ animated: Bool) {

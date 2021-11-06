@@ -5,21 +5,22 @@ import MessageKit
 
 import FirebaseAuth
 import FirebaseDatabase
-
+import FirebaseFirestore
 import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
-    var conversation = Conversation()
+    var conversation : Conversation?
     var messages = [Message]()
     
-    public var friendId : String?
-    public var friendName : String?
-    
+
     // Platform Varibles
+    public var otherUserName: String?
+    public var otherUserEmail: String?
+    public var otherUserId: String?
     public var isNewConversation = false
     
-    //Date Formating to string
+    // Date Formating to string
     public static var dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
@@ -28,23 +29,22 @@ class ChatViewController: MessagesViewController {
             return formatter
     }()
     
-    // Returen self sender
+    // Returen self sender who is current user
     private var selfSender: Sender? {
-        guard let userID = Auth.auth().currentUser?.uid else {
+        guard let userID = Auth.auth().currentUser?.uid, let userName = defaults.string(forKey: "cuerrentUserName") else {
             return nil
         }
-        return Sender(senderId: userID, displayName: "Me", profileImage: "")
+        return Sender(senderId: userID, displayName: userName, profileImage: "")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpChat()
-        let testMessage = Message(sender: Sender(senderId: "0", displayName: "defulte", profileImage: ""), messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hello World!"))
-        insertNewMessage(testMessage)
+        listenForMessages(shouldScrollToBottom: true)
     }
     
-    // Set up ChatVC
-    func setUpChat(){
+    // Set up chat UI
+    private func setUpChat(){
         self.navigationController?.navigationBar.tintColor = UIColor(red: 0.95, green: 0.52, blue: 0.44, alpha: 1.00)
         self.navigationController?.isNavigationBarHidden = false
         messagesCollectionView.messagesDataSource = self
@@ -52,57 +52,107 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         removeMessageAvatars()
+        getAllMessages()
     }
-     
-    // Insert new message in UI
+    
+    // Insert new message in chat UI and store in firebase
     private func insertNewMessage(_ message: Message) {
         if messages.contains(where: {$0.messageId == message.messageId}) {
            return
         }
+        //listenForMessages(shouldScrollToBottom: true)
         messages.append(message)
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem(animated: true)
         
-        self.conversation.messages.append(message)
-//        DatabaseManger.shared.insertMessage(with: conversation) { success in
-//            print("success add message")
-//        }
+        DatabaseManger.shared.insertMessage(with: message) { success in
+            print("success add message")
+        }
     }
     
-//    Test Messages
-//    override func viewDidAppear(_ animated: Bool) {
-//      super.viewDidAppear(animated)
-//        let testMessage = Message(sender: currentSender(), messageId: "1", sentDate: Date().addingTimeInterval(-86400), kind: .text("Hello"))
-//        insertNewMessage(testMessage)
-//        let testMessage2 = Message(sender: senderUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hi"))
-//        insertNewMessage(testMessage2)
-//    }
+    private func getAllMessages() {
+        DatabaseManger.shared.fetchAllMessages { value in
+            var message : Message?
+            do {
+                let messagesRoot = try value.get()
+                for (messageId , messageInfo) in messagesRoot {
 
+                    let thisMessage = messageInfo as! [String : String]
+                    let sendDate = self.convertStringToDate(stringDate: thisMessage["sentDate"]!)
+                    let sender = Sender(senderId: thisMessage["senderId"]! , displayName: thisMessage["senderName"]!, profileImage: "")
+
+                    message = Message(sender: sender, messageId: messageId, sentDate: sendDate, kind: .text(thisMessage["text"]!))
+                    self.messages.append(message!)
+
+                    DispatchQueue.main.async {
+                        self.messagesCollectionView.reloadData()
+                    }
+                }
+            } catch {
+                print("ERROR: \(error.localizedDescription)")
+            }
+
+        }
+    }
+    
+    private func convertStringToDate(stringDate: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+        let date = dateFormatter.date(from: stringDate)
+        return date ?? Date()
+    }
+
+    private func listenForMessages(shouldScrollToBottom: Bool) {
+        DatabaseManger.shared.getAllMessagesForConversation { [weak self] messagesResult in
+            
+            
+            switch messagesResult {
+                case .success(let messages):
+                    print("success in getting messages: \(messages)")
+                    guard !messages.isEmpty else {
+                        print("messages are empty")
+                        return
+                    }
+                
+                    DispatchQueue.main.async {
+                        self?.messages = messages
+                        self?.messagesCollectionView.reloadDataAndKeepOffset()
+                        self?.messagesCollectionView.reloadData()
+                        if shouldScrollToBottom {
+                            self?.messagesCollectionView.scrollToLastItem()
+                        }
+                    }
+                    
+                case .failure(let error):
+                    print("failed to get messages: \(error)")
+            }
+        }
+    }
 }
+ 
 
-
-// MARK: - MessagesDataSource
+// message data with MessagesDataSource
 extension ChatViewController: MessagesDataSource {
     
-    // 1 Number of messages
+    // (1) Number of messages
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
     return messages.count
     }
 
-    // 2 Current sender = current user
+    // (2) Current sender = current user
     func currentSender() -> SenderType {
         if let sender = selfSender {
             return sender
         }
-        return Sender(senderId: "12", displayName: "erroe", profileImage: "")
+        return Sender(senderId: "error", displayName: "erroe", profileImage: "")
     }
 
-    // 3 Show messsages
+    // (3) Show messsages
     func messageForItem( at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView ) -> MessageType {
         return messages[indexPath.section]
     }
 
-    // 4 Name above messages
+    // (4) Name above messages
     func messageTopLabelAttributedText( for message: MessageType, at indexPath: IndexPath ) -> NSAttributedString? {
         let name = message.sender.displayName
             return NSAttributedString(string: name, attributes: [.font:
@@ -111,20 +161,21 @@ extension ChatViewController: MessagesDataSource {
     }
 }
 
-// MARK: - MessagesLayoutDelegate
+//  Design chat UI with MessagesLayoutDelegate
 extension ChatViewController: MessagesLayoutDelegate {
-  // 1
+
   func footerViewSize(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGSize {
     return CGSize(width: 0, height: 8)
   }
 
-  // 2
   func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
     return 20
   }
+    
 }
 
-// MARK: - MessagesDisplayDelegate
+
+// Design chat UI with MessagesDisplayDelegate
 extension ChatViewController: MessagesDisplayDelegate {
   
     func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
@@ -141,7 +192,6 @@ extension ChatViewController: MessagesDisplayDelegate {
         avatarView.isHidden = true
     }
     
-    // style of message shape
     func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
         let corner: MessageStyle.TailCorner = isFromCurrentSender(message: message) ? .bottomRight : .bottomLeft
         return .bubbleTail(corner, .curved)
@@ -169,7 +219,7 @@ extension ChatViewController: MessagesDisplayDelegate {
     }
 }
 
-
+// Inputbar functions
 extension ChatViewController: InputBarAccessoryViewDelegate {
     
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
@@ -179,7 +229,7 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
             return
         }
         let message = Message(sender: selfSender, messageId: messageId, sentDate: Date(), kind: .text(text))
-        print("sending: \(text)")
+        defaults.set(text, forKey: "text")
         insertNewMessage(message)
         inputBar.inputTextView.text = ""
         
@@ -196,3 +246,14 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
 }
 
 
+
+
+
+//    Test Messages
+//    override func viewDidAppear(_ animated: Bool) {
+//      super.viewDidAppear(animated)
+//        let testMessage = Message(sender: currentSender(), messageId: "1", sentDate: Date().addingTimeInterval(-86400), kind: .text("Hello"))
+//        insertNewMessage(testMessage)
+//        let testMessage2 = Message(sender: senderUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hi"))
+//        insertNewMessage(testMessage2)
+//    }

@@ -5,50 +5,24 @@ import FirebaseAuth
 import FirebaseDatabase
 import JGProgressHUD
 
-
+public let defaults = UserDefaults.standard
 
 class ConversationViewController: UIViewController {
     
-
+    var users = [User]()
+    var conversations = [Conversation]()
     
-    var users = [UserNSObject]()
-
+    public var otherUserName: String?
+    public var otherUserEmail: String?
+    public var otherUserId: String?
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var profileImage: UIImageView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchAllUsersInFirebaseDatabase()
-    }
-
-    func fetchAllUsersInFirebaseDatabase() {
-        DatabaseManger.shared.getAllUsers { value in
-          
-            var user = UserNSObject()
-            do {
-                let userRoot = try value.get()
-                for (userId , userDic) in userRoot {
-                    if userId != Auth.auth().currentUser?.uid {
-                        
-                        let thisUser = userDic as! [String : Any]
-                        user.userId = userId
-                        user.fullName = thisUser["fullName"] as? String
-                        user.email = thisUser["email"] as? String
-                        user.userId = thisUser["userId"] as? String
-                        user.profileImage = thisUser["profileImage"] as? String
-                        self.users.append(user)
-                        print("User ID :\(user.userId!) , Email: \(user.email!), Name: \(user.fullName!)")
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                        
-                    }
-                }
-            } catch {
-                print("ERROR: \(error.localizedDescription)")
-            } 
-
-        }
+        getAllUsers()
+        getAllConversations()
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -64,7 +38,7 @@ class ConversationViewController: UIViewController {
     }
     // IBAction
     @IBAction func newChatButton(_ sender: UIButton) {
-        didTapComposeButton()
+      //  didTapComposeButton()
     }
     
     @IBAction func logoutButton(_ sender: UIButton) {
@@ -77,7 +51,7 @@ class ConversationViewController: UIViewController {
         }
     }
     
-    // Set up VC
+    // Set up conversation UI
     private func setUpTableView() {
         tableView.delegate = self
         tableView.dataSource = self
@@ -92,16 +66,6 @@ class ConversationViewController: UIViewController {
         }
     }
     
-    // Search for user
-    private let spinner = JGProgressHUD(style: .dark)
-    
-    // present new conversation view controller
-    @objc private func didTapComposeButton(){
-        let  newConversationVC = NewConversationViewController()
-        let navVC = UINavigationController(rootViewController: newConversationVC)
-        present(navVC,animated: true)
-    }
-    
     private func hideTableView(){
         if tableView.numberOfRows(inSection: 0) == 0 {
             tableView.isHidden = true
@@ -109,9 +73,97 @@ class ConversationViewController: UIViewController {
             tableView.isHidden = false
         }
     }
-    
-    
+    // MARK: Deal with Firebsae
+    private func createNewConversation(){
 
+        guard let currentUserId = Auth.auth().currentUser?.uid, let otherUserId = defaults.string(forKey: "otherUserId") else {
+            return
+        }
+        if conversations.count == 0 {
+            let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "..", senderUserId: currentUserId)
+            insertNewConversation(conversation)
+            conversations.append(conversation)
+            defaults.set(conversation.conversationId, forKey: "conversationId")
+        } else {
+            for i in 0..<conversations.count {
+                if conversations[i].conversationId == "\(currentUserId)_\(otherUserId)" || conversations[i].conversationId == "\(otherUserId)_\(currentUserId)" {
+                    defaults.set(conversations[i].conversationId, forKey: "conversationId")
+                } else {
+                    let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "..", senderUserId: currentUserId)
+                    insertNewConversation(conversation)
+                    conversations.append(conversation)
+                    defaults.set(conversation.conversationId, forKey: "conversationId")
+                }
+            }
+        }
+    }
+    
+    private func insertNewConversation(_ conversation: Conversation) {
+        DatabaseManger.shared.insertConversation(with: conversation) { success in
+            print("success add Conversation")
+        }
+
+    }
+    
+    func getAllUsers() {
+        DatabaseManger.shared.fetchAllUsers { value in
+            var user = User()
+            do {
+                let userRoot = try value.get()  // "users" is the root in database
+                for (userId , userInfo) in userRoot {  // loop in dictionery [Key = userId : Value = user info]
+                    if userId != Auth.auth().currentUser?.uid {   // get all users except current user
+                        
+                        let thisUser = userInfo as! [String : Any]  // conver userInfo to dictionery to save in User Object
+                        user.userId = userId
+                        user.fullName = thisUser["fullName"] as? String
+                        user.email = thisUser["email"] as? String
+                        user.userId = thisUser["userId"] as? String
+                        user.profileImage = thisUser["profileImage"] as? String
+                        
+                        self.users.append(user)
+                        print("User ID :\(user.userId!) , Email: \(user.email!), Name: \(user.fullName!)")
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                        
+                    } else {
+                        let currentUser = userInfo as! [String : Any]  // conver userInfo to dictionery to save in User Object
+                        defaults.set(currentUser["fullName"], forKey: "cuerrentUserName")
+                        defaults.set(currentUser["email"], forKey: "cuerrentUserEmail")
+                        defaults.set(currentUser["profileImage"], forKey: "cuerrentUserProfileImage")
+                    }
+                }
+            } catch {
+                print("ERROR: \(error.localizedDescription)")
+            }
+
+        }
+    }
+    
+    func getAllConversations() {
+        DatabaseManger.shared.fetchAllConversations { value in
+            var conversation : Conversation?
+            do {
+                let conversationRoot = try value.get()
+                for (conversationId , conversationInfo) in conversationRoot {
+                    let thisConversation = conversationInfo as! [String : Any]
+                    let lastMessage = thisConversation["lastMessage"]!
+                    let sendUseerId = thisConversation["senderUserId"]!
+                    
+                    conversation = Conversation(conversationId: conversationId, lastMessage: lastMessage as! String, senderUserId: sendUseerId as! String)
+                    self.conversations.append(conversation!)
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            } catch {
+                print("ERROR: \(error.localizedDescription)")
+            }
+
+        }
+    }
+    
 }
 
 
@@ -133,6 +185,12 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
         let chatVC = self.storyboard?.instantiateViewController(withIdentifier: "ChatViewController") as! ChatViewController
         chatVC.title = users[indexPath.row].fullName!
         chatVC.navigationItem.largeTitleDisplayMode = .never
+        
+        defaults.set(users[indexPath.row].fullName!, forKey: "otherUserName")
+        defaults.set(users[indexPath.row].userId!, forKey: "otherUserId")
+        
+        createNewConversation()
+        
         self.navigationController?.pushViewController(chatVC, animated: true)
     }
     

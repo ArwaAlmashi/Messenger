@@ -7,48 +7,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5F65F32E-02A6-4593-894E-C609F6137595"
-            shouldBeEnabled = "Yes"
+            uuid = "6C0DB316-4E4A-475B-8B8A-BF20DC58C17E"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Messenger/Models/DatabaseManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "15"
-            endingLineNumber = "15"
-            landmarkName = "insertUser(with:completion:)"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
+            landmarkName = "fetchAllConversations(completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "92AEDED1-AF29-492B-9548-28D19C31A272"
+            uuid = "1A2315ED-2E7C-4255-8B43-DEFF9448C6B3"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Messenger/Controllers/Conversation/ChatViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
-            landmarkName = "insertNewMessage(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "CACDFF80-7515-4A0F-B6A1-CDDA8C44DBBD"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Messenger/Models/DatabaseManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "insertMessage(with:completion:)"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
+            landmarkName = "listenForMessages(shouldScrollToBottom:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

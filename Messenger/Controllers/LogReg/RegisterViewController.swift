@@ -18,7 +18,7 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var profileImageButtonOutlet: UIButton!
     
     var delegate : registerDelegate?
-    var user : User?
+    var userInfoValdiate : [String : String]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,16 +42,21 @@ class RegisterViewController: UIViewController {
     func createNewUser() {
         validationUserInput()
         
-        if let user = user {
-            Auth.auth().createUser(withEmail: user.email, password: user.password) {
+        if let user = userInfoValdiate {
+            
+            guard let firstName = user["firstName"], let lastName = user["lastName"], let password = user["password"],
+                  let email = user["email"], let profileImage = user["profileImage"] else {return}
+
+            Auth.auth().createUser(withEmail: email, password: password) {
                 (authResult: AuthDataResult?, error: Error?) in
-                
                 if let error = error {
                     self.errorMessege(messege: error.localizedDescription)
                 } else {
-                    DatabaseManger.shared.insertUser(with: user) { isUserdInsert in
+                    let userObject = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: profileImage)
+                    
+                    DatabaseManger.shared.insertUser(with: userObject) { isUserdInsert in
                         if isUserdInsert {
-                            print("sucess adding the user account: \(user.email)")
+                            print("sucess adding the user account: \(userObject.email ?? "No user email")")
                         }
                     }
                     self.delegate?.registerSuccessful()
@@ -63,7 +68,7 @@ class RegisterViewController: UIViewController {
     }
     
     // Valdiation user inputs
-    func validationUserInput() {
+    func validationUserInput(){
         
         guard let firstName = firstNameTextField.text, !firstName.isEmpty else {
             validationAlertMessege(messege: "first name field can not be empty")
@@ -81,14 +86,13 @@ class RegisterViewController: UIViewController {
             validationAlertMessege(messege: "password field can not be empty")
             return
         }
-//        guard let profileImage = profileImageButtonOutlet else {
-//        validationAlertMessege(messege: "profile image can not be empty")
-//            return
-//        }
-        
-        let tempProfileImageURL = "URL image"
-        self.user = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: tempProfileImageURL, password: password, conversation: [])
-
+        userInfoValdiate = [
+            "firstName" : firstName,
+            "lastName" : lastName,
+            "email" : email,
+            "profileImage" : "No",
+            "password" : password,
+        ]
     }
     
     // Error Message from Firebase
