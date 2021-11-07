@@ -26,6 +26,29 @@ class ConversationViewController: UIViewController {
         super.viewDidLoad()
         getAllUsers()
         getAllConversations()
+        listenForConversations()
+    }
+    
+    private func listenForConversations() {
+        DatabaseManger.shared.getAllConversation { [weak self] conversationResult in
+            switch conversationResult {
+                case .success(let conversations):
+                print("0000000000000000000000000")
+                    print("success in getting conversation listning: \(conversations)")
+                    guard !conversations.isEmpty else {
+                        print("converations are empty")
+                        return
+                    }
+                    self?.conversations = conversations
+                    
+                    DispatchQueue.main.async {
+                        self?.tableView.reloadData()
+                    }
+                    
+                case .failure(let error):
+                    print("failed to get conversations: \(error)")
+            }
+        }
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -79,7 +102,7 @@ class ConversationViewController: UIViewController {
             return
         }
         if conversations.count == 0 {
-            let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "..", senderUserId: currentUserId)
+            let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "", senderUserId: currentUserId)
             insertNewConversation(conversation)
             conversations.append(conversation)
             defaults.set(conversation.conversationId, forKey: "conversationId")
@@ -88,12 +111,15 @@ class ConversationViewController: UIViewController {
                 if conversations[i].conversationId == "\(currentUserId)_\(otherUserId)" || conversations[i].conversationId == "\(otherUserId)_\(currentUserId)" {
                     defaults.set(conversations[i].conversationId, forKey: "conversationId")
                 } else {
-                    let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "..", senderUserId: currentUserId)
+                    let conversation = Conversation(conversationId: "\(currentUserId)_\(otherUserId)", lastMessage: "", senderUserId: currentUserId)
                     insertNewConversation(conversation)
                     conversations.append(conversation)
                     defaults.set(conversation.conversationId, forKey: "conversationId")
                 }
             }
+        }
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
         }
     }
     
@@ -176,7 +202,8 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ConversationCell", for: indexPath) as! ConversationCell
         cell.nameLabel.text = users[indexPath.row].fullName!
-        cell.emailLabel.text = users[indexPath.row].email!
+        //cell.emailLabel.text = users[indexPath.row].email!
+        cell.emailLabel.text = conversations[indexPath.row].lastMessage
     
         guard let profileImageUrl = users[indexPath.row].profileImage else {
             return cell

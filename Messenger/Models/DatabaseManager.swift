@@ -114,6 +114,36 @@ extension DatabaseManger {
        }
     }
     
+    public func getAllConversation(completion: @escaping (Result<[Conversation], Error>) -> Void) {
+        guard let cureentUserId = Auth.auth().currentUser?.uid else {
+            return
+        }
+        database.child("users").child(cureentUserId).child("conversations").observe( .value) { snapshot in
+           guard let value = snapshot.value as? [String: Any] else {
+               completion(.failure(DatabaseError.failedToFetch))
+               return
+           }
+            let conversations : [Conversation] = value.compactMap { conversationDictionery in
+                guard let conversationDictionery = conversationDictionery.value as? [String:Any] else {
+                return nil
+                }
+                        
+                guard let conversationsId = conversationDictionery["conversationId"] as? String,
+                      let lastMessage = conversationDictionery["lastMessage"] as? String,
+                      let senderUserId = conversationDictionery["senderUserId"] as? String else {
+                          return nil
+                      }
+                print("Last message = \(lastMessage)")
+                
+
+                return Conversation(conversationId: conversationsId, lastMessage: lastMessage, senderUserId: senderUserId)
+
+            }
+           completion(.success(conversations))
+       }
+
+    }
+    
 }
 // MARK: Messages
 extension DatabaseManger{
