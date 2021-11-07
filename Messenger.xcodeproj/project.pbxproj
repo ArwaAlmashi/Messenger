@@ -32,10 +32,11 @@
 		C39EE81F2731187F00888788 /* TestChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39EE81E2731187F00888788 /* TestChatViewController.swift */; };
 		C39EE82327315AE200888788 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39EE82227315AE200888788 /* ChatViewController.swift */; };
 		C3CB18B42733F70600EC8A3E /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB18B32733F70600EC8A3E /* Conversation.swift */; };
+		C3CB18B72736BD2F00EC8A3E /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB18B62736BD2F00EC8A3E /* StorageManager.swift */; };
 		C3D2D8EB2729733300EBD119 /* ConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */; };
 		C3D2D8ED2729736600EBD119 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8EC2729736600EBD119 /* LoginViewController.swift */; };
 		C3D2D8EF2729738400EBD119 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8EE2729738400EBD119 /* RegisterViewController.swift */; };
-		C3D2D8F12729739D00EBD119 /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8F02729739D00EBD119 /* NewConversationViewController.swift */; };
+		C3D2D8F12729739D00EBD119 /* SearchUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8F02729739D00EBD119 /* SearchUserViewController.swift */; };
 		C3D2D8F3272973BA00EBD119 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8F2272973BA00EBD119 /* ProfileViewController.swift */; };
 		C3FCEE122729507B005657DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FCEE112729507B005657DB /* AppDelegate.swift */; };
 		C3FCEE142729507B005657DB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FCEE132729507B005657DB /* SceneDelegate.swift */; };
@@ -83,10 +84,11 @@
 		C39EE81E2731187F00888788 /* TestChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestChatViewController.swift; sourceTree = "<group>"; };
 		C39EE82227315AE200888788 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		C3CB18B32733F70600EC8A3E /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
+		C3CB18B62736BD2F00EC8A3E /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewController.swift; sourceTree = "<group>"; };
 		C3D2D8EC2729736600EBD119 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C3D2D8EE2729738400EBD119 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		C3D2D8F02729739D00EBD119 /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
+		C3D2D8F02729739D00EBD119 /* SearchUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserViewController.swift; sourceTree = "<group>"; };
 		C3D2D8F2272973BA00EBD119 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		C3FCEE0E2729507B005657DB /* Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3FCEE112729507B005657DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				C3704B612730025600DF050E /* DatabaseManager.swift */,
+				C3CB18B62736BD2F00EC8A3E /* StorageManager.swift */,
 				C396F0C1272ECBE200EEEF59 /* Struct */,
 			);
 			path = Models;
@@ -199,7 +202,7 @@
 			children = (
 				C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */,
 				C39EE8182730FEAF00888788 /* ConversationCell.swift */,
-				C3D2D8F02729739D00EBD119 /* NewConversationViewController.swift */,
+				C3D2D8F02729739D00EBD119 /* SearchUserViewController.swift */,
 				C39EE82227315AE200888788 /* ChatViewController.swift */,
 			);
 			path = Conversation;
@@ -584,12 +587,13 @@
 				C3D2D8ED2729736600EBD119 /* LoginViewController.swift in Sources */,
 				C3704B622730025600DF050E /* DatabaseManager.swift in Sources */,
 				C3FCEE162729507B005657DB /* GetStartedViewController.swift in Sources */,
-				C3D2D8F12729739D00EBD119 /* NewConversationViewController.swift in Sources */,
+				C3D2D8F12729739D00EBD119 /* SearchUserViewController.swift in Sources */,
 				C3D2D8EF2729738400EBD119 /* RegisterViewController.swift in Sources */,
 				C39EE81B273116DC00888788 /* Message.swift in Sources */,
 				C39EE82327315AE200888788 /* ChatViewController.swift in Sources */,
 				C3FCEE122729507B005657DB /* AppDelegate.swift in Sources */,
 				C3D2D8EB2729733300EBD119 /* ConversationViewController.swift in Sources */,
+				C3CB18B72736BD2F00EC8A3E /* StorageManager.swift in Sources */,
 				C39EE81D2731174400888788 /* Sender.swift in Sources */,
 				C3D2D8F3272973BA00EBD119 /* ProfileViewController.swift in Sources */,
 				C39EE8192730FEAF00888788 /* ConversationCell.swift in Sources */,

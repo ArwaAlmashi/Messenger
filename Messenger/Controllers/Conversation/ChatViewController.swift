@@ -40,6 +40,11 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpChat()
+        //listenForMessages(shouldScrollToBottom: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         listenForMessages(shouldScrollToBottom: true)
     }
     
@@ -52,7 +57,7 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         removeMessageAvatars()
-        getAllMessages()
+        //getAllMessages()
     }
     
     // Insert new message in chat UI and store in firebase
@@ -103,9 +108,7 @@ class ChatViewController: MessagesViewController {
     }
 
     private func listenForMessages(shouldScrollToBottom: Bool) {
-        DatabaseManger.shared.getAllMessagesForConversation { [weak self] messagesResult in
-            
-            
+        DatabaseManger.shared.getAllMessagesForConversation { [weak self] messagesResult in            
             switch messagesResult {
                 case .success(let messages):
                     print("success in getting messages: \(messages)")
@@ -117,7 +120,7 @@ class ChatViewController: MessagesViewController {
                     DispatchQueue.main.async {
                         self?.messages = messages
                         self?.messagesCollectionView.reloadDataAndKeepOffset()
-                        self?.messagesCollectionView.reloadData()
+                        //self?.messagesCollectionView.reloadData()
                         if shouldScrollToBottom {
                             self?.messagesCollectionView.scrollToLastItem()
                         }

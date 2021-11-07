@@ -2,7 +2,7 @@
 
 import UIKit
 
-class NewConversationViewController: UIViewController {
+class SearchUserViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

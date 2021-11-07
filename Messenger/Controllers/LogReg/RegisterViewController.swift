@@ -3,6 +3,8 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseStorage
+
 
 protocol registerDelegate {
     func registerSuccessful()
@@ -10,6 +12,11 @@ protocol registerDelegate {
 
 class RegisterViewController: UIViewController {
     
+    private let storge = Storage.storage().reference()
+    
+    var delegate : registerDelegate?
+    var userInfoValdiate = [String : String]()
+    var selectedImage = UIImageView()
 
     @IBOutlet weak var firstNameTextField: UITextField!
     @IBOutlet weak var lastNameTextField: UITextField!
@@ -17,12 +24,10 @@ class RegisterViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var profileImageButtonOutlet: UIButton!
     
-    var delegate : registerDelegate?
-    var userInfoValdiate : [String : String]?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
     }
     
     // IBAction
@@ -41,29 +46,29 @@ class RegisterViewController: UIViewController {
     // Register User & Firebase authentcation & Insert into RealDB
     func createNewUser() {
         validationUserInput()
-        
-        if let user = userInfoValdiate {
-            
-            guard let firstName = user["firstName"], let lastName = user["lastName"], let password = user["password"],
-                  let email = user["email"], let profileImage = user["profileImage"] else {return}
+        //uploadImageToFirebase(image: self.selectedImage.image!)
 
-            Auth.auth().createUser(withEmail: email, password: password) {
-                (authResult: AuthDataResult?, error: Error?) in
-                if let error = error {
-                    self.errorMessege(messege: error.localizedDescription)
-                } else {
-                    let userObject = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: profileImage)
-                    
-                    DatabaseManger.shared.insertUser(with: userObject) { isUserdInsert in
-                        if isUserdInsert {
-                            print("sucess adding the user account: \(userObject.email ?? "No user email")")
-                        }
-                    }
-                    self.delegate?.registerSuccessful()
-                    self.navigationController?.popViewController(animated: false)
-                }
+        guard let firstName = userInfoValdiate["firstName"], let lastName = userInfoValdiate["lastName"], let password = userInfoValdiate["password"],
+              let email = userInfoValdiate["email"], let profileImage = defaults.string(forKey: "profileImageUrl") else {
+                  return
+        }
+        
+        Auth.auth().createUser(withEmail: email, password: password) {
+            (authResult: AuthDataResult?, error: Error?) in
+            if let error = error {
+                self.errorMessege(messege: error.localizedDescription)
+            } else {
+                let userObject = User(fullName: "\(firstName) \(lastName)", email: email, profileImage: profileImage)
                 
+                DatabaseManger.shared.insertUser(with: userObject) { isUserdInsert in
+                    if isUserdInsert {
+                        print("sucess adding the user account: \(userObject.email ?? "No user email")")
+                    }
+                }
+                self.delegate?.registerSuccessful()
+                self.navigationController?.popViewController(animated: false)
             }
+            
         }
     }
     
@@ -86,11 +91,11 @@ class RegisterViewController: UIViewController {
             validationAlertMessege(messege: "password field can not be empty")
             return
         }
+        
         userInfoValdiate = [
             "firstName" : firstName,
             "lastName" : lastName,
             "email" : email,
-            "profileImage" : "No",
             "password" : password,
         ]
     }
@@ -149,6 +154,7 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
         guard let selectedImage = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {
             return
         }
+        self.selectedImage.image = selectedImage
         insertProfilePhoto(image: selectedImage)
     }
 
@@ -158,6 +164,37 @@ extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationC
         profileImageButtonOutlet.layer.borderWidth = 5
         profileImageButtonOutlet.layer.borderColor = UIColor.white.cgColor
         profileImageButtonOutlet.setBackgroundImage(image, for: .normal)
+        uploadImageToFirebase(image: self.selectedImage.image!)
+    }
+    
+
+    func uploadImageToFirebase(image: UIImage) {
+        
+        guard let image = image.pngData() else {
+            return
+        }
+        let fileName = randomString(length: 20)
+        StorageManager.shared.uploadProfileImage(with: image, filename: "\(fileName).png") { result in
+            switch result {
+            case .success(_) :
+                do{
+                    let imageUrl = try result.get()
+                    defaults.set(imageUrl, forKey: "profileImageUrl")
+                    self.userInfoValdiate["profileImage"] = imageUrl
+                    
+                } catch {
+                    print("error")
+                }
+                break
+            case .failure(_):
+                print("error")
+            }
+        }
+    }
+    
+    func randomString(length: Int) -> String {
+      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      return String((0..<length).map{ _ in letters.randomElement()! })
     }
 
     

@@ -4,6 +4,8 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 import JGProgressHUD
+import FirebaseStorage
+import SDWebImage
 
 public let defaults = UserDefaults.standard
 
@@ -11,6 +13,7 @@ class ConversationViewController: UIViewController {
     
     var users = [User]()
     var conversations = [Conversation]()
+    var userURL : String?
     
     public var otherUserName: String?
     public var otherUserEmail: String?
@@ -37,18 +40,14 @@ class ConversationViewController: UIViewController {
         }
     }
     // IBAction
-    @IBAction func newChatButton(_ sender: UIButton) {
-      //  didTapComposeButton()
+    @IBAction func searchForUserButton(_ sender: UIButton) {
+        let searchVC = self.storyboard?.instantiateViewController(withIdentifier: "SearchUserViewController") as! SearchUserViewController
+        self.navigationController?.present(searchVC, animated: true, completion: nil)
     }
     
-    @IBAction func logoutButton(_ sender: UIButton) {
-        do {
-            try FirebaseAuth.Auth.auth().signOut()
-            backToGetStarted()
-        }
-        catch {
-            print("Error: \(error.localizedDescription)")
-        }
+    @IBAction func profileSettingButton(_ sender: UIButton) {
+        let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+        self.navigationController?.pushViewController(profileVC, animated: true)
     }
     
     // Set up conversation UI
@@ -178,6 +177,21 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
         let cell = tableView.dequeueReusableCell(withIdentifier: "ConversationCell", for: indexPath) as! ConversationCell
         cell.nameLabel.text = users[indexPath.row].fullName!
         cell.emailLabel.text = users[indexPath.row].email!
+    
+        guard let profileImageUrl = users[indexPath.row].profileImage else {
+            return cell
+        }
+        let url = URL(string: profileImageUrl)
+        URLSession.shared.dataTask(with: url!, completionHandler: { data, response, error in
+            if error != nil {
+                print("Error: \(error!)")
+                return
+            }
+            DispatchQueue.main.async {
+                cell.profileImage.image = UIImage(data: data!)
+            }
+        }).resume()
+    
         return cell
     }
     
