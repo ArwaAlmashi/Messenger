@@ -25,7 +25,7 @@ class ConversationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         getAllUsers()
-        getAllConversations()
+//        getAllConversations()
         listenForConversations()
     }
     
@@ -156,30 +156,6 @@ class ConversationViewController: UIViewController {
                         defaults.set(currentUser["fullName"], forKey: "cuerrentUserName")
                         defaults.set(currentUser["email"], forKey: "cuerrentUserEmail")
                         defaults.set(currentUser["profileImage"], forKey: "cuerrentUserProfileImage")
-                    }
-                }
-            } catch {
-                print("ERROR: \(error.localizedDescription)")
-            }
-
-        }
-    }
-    
-    func getAllConversations() {
-        DatabaseManger.shared.fetchAllConversations { value in
-            var conversation : Conversation?
-            do {
-                let conversationRoot = try value.get()
-                for (conversationId , conversationInfo) in conversationRoot {
-                    let thisConversation = conversationInfo as! [String : Any]
-                    let lastMessage = thisConversation["lastMessage"]!
-                    let sendUseerId = thisConversation["senderUserId"]!
-                    
-                    conversation = Conversation(conversationId: conversationId, lastMessage: lastMessage as! String, senderUserId: sendUseerId as! String)
-                    self.conversations.append(conversation!)
-                    
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
                     }
                 }
             } catch {

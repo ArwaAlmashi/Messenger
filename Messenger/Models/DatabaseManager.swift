@@ -99,21 +99,7 @@ extension DatabaseManger {
         }
     }
     
-    // get all conversations
-    public func fetchAllConversations(completion: @escaping (Result<[String: Any], Error>) -> Void){
-        
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
-            return
-        }
-        database.child("users").child(currentUserId).child("conversations").observeSingleEvent(of: .value) { snapshot in
-           guard let value = snapshot.value as? [String: Any] else {
-               completion(.failure(DatabaseError.failedToFetch))
-               return
-           }
-           completion(.success(value))
-       }
-    }
-    
+    // get cll conversations
     public func getAllConversation(completion: @escaping (Result<[Conversation], Error>) -> Void) {
         guard let cureentUserId = Auth.auth().currentUser?.uid else {
             return
