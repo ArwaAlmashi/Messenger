@@ -38,7 +38,6 @@ class ConversationViewController: UIViewController {
                         return
                     }
                     self?.conversations = conversations
-                    self?.getAllUsers()
                     DispatchQueue.main.async {
                         self?.tableView.reloadData()
                     }
@@ -181,7 +180,7 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
         cell.nameLabel.text = users[indexPath.row].fullName!
         
         if conversations.count > 0 {
-            cell.emailLabel.text = conversations[indexPath.row].lastMessage
+            cell.emailLabel.text = conversations[0].lastMessage
         }
     
         guard let profileImageUrl = users[indexPath.row].profileImage else {
