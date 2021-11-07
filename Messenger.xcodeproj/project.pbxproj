@@ -31,6 +31,7 @@
 		C39EE81D2731174400888788 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39EE81C2731174400888788 /* Sender.swift */; };
 		C39EE81F2731187F00888788 /* TestChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39EE81E2731187F00888788 /* TestChatViewController.swift */; };
 		C39EE82327315AE200888788 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39EE82227315AE200888788 /* ChatViewController.swift */; };
+		C3C37E732738194800E2486C /* searchUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3C37E722738194800E2486C /* searchUserCell.swift */; };
 		C3CB18B42733F70600EC8A3E /* Conversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB18B32733F70600EC8A3E /* Conversation.swift */; };
 		C3CB18B72736BD2F00EC8A3E /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3CB18B62736BD2F00EC8A3E /* StorageManager.swift */; };
 		C3D2D8EB2729733300EBD119 /* ConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */; };
@@ -83,6 +84,7 @@
 		C39EE81C2731174400888788 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
 		C39EE81E2731187F00888788 /* TestChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestChatViewController.swift; sourceTree = "<group>"; };
 		C39EE82227315AE200888788 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		C3C37E722738194800E2486C /* searchUserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchUserCell.swift; sourceTree = "<group>"; };
 		C3CB18B32733F70600EC8A3E /* Conversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conversation.swift; sourceTree = "<group>"; };
 		C3CB18B62736BD2F00EC8A3E /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewController.swift; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 			children = (
 				C378CDA42729721900C90BFA /* LogReg */,
 				C378CDA127296A8000C90BFA /* Conversation */,
+				C3C37E712738191300E2486C /* SearchUser */,
 				C378CDA027296A7300C90BFA /* Profile */,
 				C3CB18B52733F8D600EC8A3E /* Testing */,
 			);
@@ -202,7 +205,6 @@
 			children = (
 				C3D2D8EA2729733300EBD119 /* ConversationViewController.swift */,
 				C39EE8182730FEAF00888788 /* ConversationCell.swift */,
-				C3D2D8F02729739D00EBD119 /* SearchUserViewController.swift */,
 				C39EE82227315AE200888788 /* ChatViewController.swift */,
 			);
 			path = Conversation;
@@ -236,6 +238,15 @@
 				C39EE81C2731174400888788 /* Sender.swift */,
 			);
 			path = Struct;
+			sourceTree = "<group>";
+		};
+		C3C37E712738191300E2486C /* SearchUser */ = {
+			isa = PBXGroup;
+			children = (
+				C3D2D8F02729739D00EBD119 /* SearchUserViewController.swift */,
+				C3C37E722738194800E2486C /* searchUserCell.swift */,
+			);
+			path = SearchUser;
 			sourceTree = "<group>";
 		};
 		C3CB18B52733F8D600EC8A3E /* Testing */ = {
@@ -600,6 +611,7 @@
 				C3CB18B42733F70600EC8A3E /* Conversation.swift in Sources */,
 				C32B15682732825100761E24 /* TestingViewController.swift in Sources */,
 				C3FCEE142729507B005657DB /* SceneDelegate.swift in Sources */,
+				C3C37E732738194800E2486C /* searchUserCell.swift in Sources */,
 				C396F0C0272ECAA000EEEF59 /* User.swift in Sources */,
 				C39EE81F2731187F00888788 /* TestChatViewController.swift in Sources */,
 				C378CDA327296ADF00C90BFA /* Extensions.swift in Sources */,
