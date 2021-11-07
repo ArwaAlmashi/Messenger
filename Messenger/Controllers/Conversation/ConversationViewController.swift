@@ -25,7 +25,6 @@ class ConversationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         getAllUsers()
-//        getAllConversations()
         listenForConversations()
     }
     
@@ -33,14 +32,13 @@ class ConversationViewController: UIViewController {
         DatabaseManger.shared.getAllConversation { [weak self] conversationResult in
             switch conversationResult {
                 case .success(let conversations):
-                print("0000000000000000000000000")
                     print("success in getting conversation listning: \(conversations)")
                     guard !conversations.isEmpty else {
                         print("converations are empty")
                         return
                     }
                     self?.conversations = conversations
-                    
+                    self?.getAllUsers()
                     DispatchQueue.main.async {
                         self?.tableView.reloadData()
                     }
@@ -65,6 +63,7 @@ class ConversationViewController: UIViewController {
     // IBAction
     @IBAction func searchForUserButton(_ sender: UIButton) {
         let searchVC = self.storyboard?.instantiateViewController(withIdentifier: "SearchUserViewController") as! SearchUserViewController
+        searchVC.delegate = self
         self.navigationController?.present(searchVC, animated: true, completion: nil)
     }
     
@@ -127,7 +126,6 @@ class ConversationViewController: UIViewController {
         DatabaseManger.shared.insertConversation(with: conversation) { success in
             print("success add Conversation")
         }
-
     }
     
     func getAllUsers() {
@@ -144,9 +142,12 @@ class ConversationViewController: UIViewController {
                         user.email = thisUser["email"] as? String
                         user.userId = thisUser["userId"] as? String
                         user.profileImage = thisUser["profileImage"] as? String
-                        
-                        self.users.append(user)
-                        print("User ID :\(user.userId!) , Email: \(user.email!), Name: \(user.fullName!)")
+                        print("*********")
+                        if thisUser["conversations"] != nil {
+                            self.users.append(user)
+                            print("User ID :\(user.userId!) , Email: \(user.email!), Name: \(user.fullName!)")
+                        }
+
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }
@@ -178,8 +179,10 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ConversationCell", for: indexPath) as! ConversationCell
         cell.nameLabel.text = users[indexPath.row].fullName!
-        //cell.emailLabel.text = users[indexPath.row].email!
-        cell.emailLabel.text = conversations[indexPath.row].lastMessage
+        
+        if conversations.count > 0 {
+            cell.emailLabel.text = conversations[indexPath.row].lastMessage
+        }
     
         guard let profileImageUrl = users[indexPath.row].profileImage else {
             return cell
@@ -211,5 +214,20 @@ extension ConversationViewController : UITableViewDelegate, UITableViewDataSourc
         self.navigationController?.pushViewController(chatVC, animated: true)
     }
     
-    
 }
+
+extension ConversationViewController : foundUserDelegate {
+    func selectUser(user: User) {
+        guard let name = user.fullName,
+              let id = user.userId,
+              let email = user.email,
+              let image = user.profileImage else {
+                  return
+              }
+        self.users.append(User(userId: id, fullName: name, email: email, profileImage: image))
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+}
+

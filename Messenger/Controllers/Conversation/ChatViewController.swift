@@ -40,7 +40,6 @@ class ChatViewController: MessagesViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpChat()
-        //listenForMessages(shouldScrollToBottom: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -13,6 +13,7 @@ class SearchUserViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     var users : [User]?
     var selectedUsers : [User] = []
+    var delegate : foundUserDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -117,17 +118,23 @@ extension SearchUserViewController : UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let chatVC = self.storyboard?.instantiateViewController(withIdentifier: "ChatViewController") as! ChatViewController
-//        chatVC.title = users[indexPath.row].fullName!
-//        chatVC.navigationItem.largeTitleDisplayMode = .never
-//
-//        defaults.set(users[indexPath.row].fullName!, forKey: "otherUserName")
-//        defaults.set(users[indexPath.row].userId!, forKey: "otherUserId")
-//
-//        createNewConversation()
-//
-//        self.navigationController?.pushViewController(chatVC, animated: true)
+        
+        guard let fullName = selectedUsers[indexPath.row].fullName,
+              let userId = selectedUsers[indexPath.row].userId,
+              let email = selectedUsers[indexPath.row].email,
+              let profileImage = selectedUsers[indexPath.row].profileImage else {
+                  return
+              }
+        delegate?.selectUser(user: User(userId: userId, fullName: fullName, email: email, profileImage: profileImage))
+        
+        self.navigationController?.popViewController(animated: true)
+        dismiss(animated: true, completion: nil)
+
     }
     
-    
 }
+
+protocol foundUserDelegate{
+    func selectUser(user:User)
+}
+
