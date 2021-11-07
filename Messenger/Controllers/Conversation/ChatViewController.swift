@@ -57,7 +57,6 @@ class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messageInputBar.delegate = self
         removeMessageAvatars()
-        //getAllMessages()
     }
     
     // Insert new message in chat UI and store in firebase
@@ -68,38 +67,13 @@ class ChatViewController: MessagesViewController {
         //listenForMessages(shouldScrollToBottom: true)
         messages.append(message)
         messagesCollectionView.reloadData()
-        messagesCollectionView.scrollToLastItem(animated: true)
+        messagesCollectionView.scrollToLastItem()
         
         DatabaseManger.shared.insertMessage(with: message) { success in
             print("success add message")
         }
     }
-    
-    private func getAllMessages() {
-        DatabaseManger.shared.fetchAllMessages { value in
-            var message : Message?
-            do {
-                let messagesRoot = try value.get()
-                for (messageId , messageInfo) in messagesRoot {
 
-                    let thisMessage = messageInfo as! [String : String]
-                    let sendDate = self.convertStringToDate(stringDate: thisMessage["sentDate"]!)
-                    let sender = Sender(senderId: thisMessage["senderId"]! , displayName: thisMessage["senderName"]!, profileImage: "")
-
-                    message = Message(sender: sender, messageId: messageId, sentDate: sendDate, kind: .text(thisMessage["text"]!))
-                    self.messages.append(message!)
-
-                    DispatchQueue.main.async {
-                        self.messagesCollectionView.reloadData()
-                    }
-                }
-            } catch {
-                print("ERROR: \(error.localizedDescription)")
-            }
-
-        }
-    }
-    
     private func convertStringToDate(stringDate: String) -> Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
@@ -116,11 +90,9 @@ class ChatViewController: MessagesViewController {
                         print("messages are empty")
                         return
                     }
-                
+                    self?.messages = messages
                     DispatchQueue.main.async {
-                        self?.messages = messages
                         self?.messagesCollectionView.reloadDataAndKeepOffset()
-                        //self?.messagesCollectionView.reloadData()
                         if shouldScrollToBottom {
                             self?.messagesCollectionView.scrollToLastItem()
                         }
@@ -247,16 +219,3 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
     
     
 }
-
-
-
-
-
-//    Test Messages
-//    override func viewDidAppear(_ animated: Bool) {
-//      super.viewDidAppear(animated)
-//        let testMessage = Message(sender: currentSender(), messageId: "1", sentDate: Date().addingTimeInterval(-86400), kind: .text("Hello"))
-//        insertNewMessage(testMessage)
-//        let testMessage2 = Message(sender: senderUser, messageId: "2", sentDate: Date().addingTimeInterval(-70000), kind: .text("Hi"))
-//        insertNewMessage(testMessage2)
-//    }

@@ -53,7 +53,7 @@ final class DatabaseManger {
         let conversationDic : [ String : Any ] = [
             "conversationId" : conversation.conversationId,
             "lastMessage" : conversation.lastMessage,
-            "senderUserId" : conversation.senderUserId,
+            "senderUserId" : conversation.senderUserId
         ]
 
         currentUserRefrence.updateChildValues(conversationDic) { error, refrence in
@@ -73,69 +73,120 @@ final class DatabaseManger {
         }
     }
     
-    // Insert message into database
+    // MARK: Insert Message into Firebase
     public func insertMessage(with message: Message, completion: @escaping (Bool) -> Void){
         
-        // take user id
-        guard let cureentUserId = Auth.auth().currentUser?.uid, let otherUserId = defaults.string(forKey: "otherUserId"),
+        // 1) take essentials values
+        guard let cureentUserId = Auth.auth().currentUser?.uid,
+              let otherUserId = defaults.string(forKey: "otherUserId"),
+              let conversationId = defaults.string(forKey: "conversationId") ,
               let messageText =  defaults.string(forKey: "text") else {
-            return
+                  return
         }
-        
-        // take conversation id
-        let conversationId = defaults.string(forKey: "conversationId")!
-
-        // make curren and other user root
-        let currentUserMessageRefrence = self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").child("messages").child(message.messageId)
-        let otherUserMessageRefrense = self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").child("messages").child(message.messageId)
-        
-        // make curren and other user root
-        let currentUserConversationRefrence = self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)")
-        let otherUserConversationRefrense = self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)")
-        
-        
-        let messageDic : [ String : Any ] = [
-            "messageId" : message.messageId,
-            "sentDate" : "\(message.sentDate)",
-            "kind" : message.kind.messageKindString,
-            "text": messageText,
-            "senderId" : message.sender.senderId,
-            "senderName" : message.sender.displayName
-        ]
-        
         let conversationDic : [ String : Any ] = [
             "lastMessage" : messageText
         ]
 
-        currentUserMessageRefrence.updateChildValues(messageDic) { error, refrence in
-            if error != nil {
-                return
-            } else {
-                print("success adding message to the current user into Firebase")
+        
+        // 2) Insert Messsage to current user
+        self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").child("messages").observeSingleEvent(of: .value) { snapshot in
+            
+            if var usersCollection = snapshot.value as? [[String: Any]] {
+
+                let newElement = [
+                    "messageId" : message.messageId,
+                    "sentDate" : "\(message.sentDate)",
+                    "kind" : message.kind.messageKindString,
+                    "text": messageText,
+                    "senderId" : message.sender.senderId,
+                    "senderName" : message.sender.displayName
+                ]
+                usersCollection.append(newElement)
+                
+                self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").child("messages").setValue(usersCollection) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                }
+                
+            }else{
+                let newCollection: [[String: Any]] = [
+                    [
+                        "messageId" : message.messageId,
+                        "sentDate" : "\(message.sentDate)",
+                        "kind" : message.kind.messageKindString,
+                        "text": messageText,
+                        "senderId" : message.sender.senderId,
+                        "senderName" : message.sender.displayName
+                    ]
+                ]
+                self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").child("messages").setValue(newCollection) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                }
             }
         }
         
-        otherUserMessageRefrense.updateChildValues(messageDic) { error, refrence in
-            if error != nil {
-                return
-            } else {
-                print("success adding message to the other user into Firebase")
+        // 3) Insert Messsage to other user
+        self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").child("messages").observeSingleEvent(of: .value) { snapshot in
+            
+            if var usersCollection = snapshot.value as? [[String: Any]] {
+
+                let newElement = [
+                    "messageId" : message.messageId,
+                    "sentDate" : "\(message.sentDate)",
+                    "kind" : message.kind.messageKindString,
+                    "text": messageText,
+                    "senderId" : message.sender.senderId,
+                    "senderName" : message.sender.displayName
+                ]
+                usersCollection.append(newElement)
+                
+                self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").child("messages").setValue(usersCollection) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                }
+                
+            }else{
+                let newCollection: [[String: Any]] = [
+                    [
+                        "messageId" : message.messageId,
+                        "sentDate" : "\(message.sentDate)",
+                        "kind" : message.kind.messageKindString,
+                        "text": messageText,
+                        "senderId" : message.sender.senderId,
+                        "senderName" : message.sender.displayName
+                    ]
+                ]
+                self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").child("messages").setValue(newCollection) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                }
             }
         }
-        
-        currentUserConversationRefrence.updateChildValues(conversationDic) { error, refrence in
+
+        // 4) Update last message in current user
+        self.database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").updateChildValues(conversationDic) { error, refrence in
             if error != nil {
                 return
-            } else {
-                print("success adding last message to the current user into Firebase")
             }
         }
-        
-        otherUserConversationRefrense.updateChildValues(conversationDic) { error, refrence in
+
+        // 5) Update last message in current user
+        self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").updateChildValues(conversationDic) { error, refrence in
             if error != nil {
                 return
-            } else {
-                print("success adding last  message to the other user into Firebase")
             }
         }
     }
@@ -191,13 +242,16 @@ final class DatabaseManger {
             return
         }
         database.child("users").child(cureentUserId).child("conversations").child("\(conversationId)").child("messages").observe( .value) { snapshot in
-           guard let value = snapshot.value as? [String: Any] else {
+            print("Get Messages")
+            print(snapshot)
+           guard let value = snapshot.value as? [[String: Any]] else {
                completion(.failure(DatabaseError.failedToFetch))
                return
            }
+            
             let messages : [Message] = value.compactMap { messagesDictionery in
                 
-                let messageInfo = messagesDictionery.value as! [String:Any]
+                let messageInfo = messagesDictionery as! [String:Any]
                 let sendDate = self.convertStringToDate(stringDate: messageInfo["sentDate"]! as! String)
                 let sender = Sender(senderId: messageInfo["senderId"]! as! String , displayName: messageInfo["senderName"]! as! String, profileImage: "")
                 
@@ -279,5 +333,30 @@ extension DatabaseManger {
 //            }
 //            completion(true)
 //        }
+//    }
+//}
+
+
+
+//if var collectionDic = snapshot.value as? [String : Any] {
+//    var messageArray = collectionDic["messages"] as? [[String:Any]]
+//
+//    let newElement = [
+//        "messageId" : message.messageId,
+//        "sentDate" : "\(message.sentDate)",
+//        "kind" : message.kind.messageKindString,
+//        "text": messageText,
+//        "senderId" : message.sender.senderId,
+//        "senderName" : message.sender.displayName
+//    ]
+//    messageArray?.append(newElement)
+//    collectionDic["messages"] = messageArray
+//
+//    self.database.child("users").child(otherUserId).child("conversations").child("\(conversationId)").setValue(collectionDic) { error, _ in
+//        guard error == nil else {
+//            completion(false)
+//            return
+//        }
+//        completion(true)
 //    }
 //}

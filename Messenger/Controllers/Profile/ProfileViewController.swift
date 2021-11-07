@@ -12,8 +12,14 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         validateAuth()
-        showImage()
+        //showImage()
+        fullNameLabel.text = defaults.string(forKey: "cuerrentUserName")!
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showImage()
     }
     
     private func showImage(){
@@ -52,9 +58,10 @@ class ProfileViewController: UIViewController {
         
         profileImage.layer.masksToBounds = true
         profileImage.layer.cornerRadius = 286/2
-
-        profileImage.layer.borderWidth = 3
+        
+        profileImage.layer.borderWidth = 5
         profileImage.layer.borderColor = UIColor.white.cgColor
+       
 
     }
     
